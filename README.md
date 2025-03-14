@@ -175,6 +175,24 @@ rule XProtect_MACOS_SLEEPYSTEGOSAURUS_SYM {
 
 This is not a blogpost about YARA rules, but as before - this is a gold mine for malware authors (e.g. `43 68 65 63 6B 50 72 6F 63 65 73 73` is `CheckProcess`).
 
+### gk.db
+Here you can see the integration between XProtect and [Gatekeeper](https://github.com/yo-yo-yo-jbo/macos_gatekeeper/).  
+This is a SQLite database containing a "blacklist" of file hashes and team IDs to block. You can view it with the `sqlite3` utility.
+
+```
+jbo@McJbo ~ $ sqlite3 gk.db .schema
+CREATE TABLE settings (name TEXT, value TEXT, PRIMARY KEY (name));
+CREATE TABLE blocked_hashes (hash BLOB, hash_type INTEGER, flags INTEGER, PRIMARY KEY (hash, hash_type));
+CREATE TABLE blocked_teams (team_id TEXT, flags INTEGER, PRIMARY KEY (team_id));
+jbo@McJbo ~ $ sqlite3 gk.db "SELECT * FROM blocked_teams LIMIT 5;"
+F9X83Q5222|1
+Q6XAB4776L|0
+DK5C9Y86C8|0
+8VK2WEPW22|0
+5LWMEF3EX3|0
+root@McJbo Resources #
+```
+
 ## XProtect Remediator
 A new XProtect System application stored as `/Library/Apple/System/Library/CoreServices/XProtect.app` wad introduced in macOS Monterey, and is responsible for running `XProtect Remediator`.  
 Unlike the traditional XProtect (which primarily used signature-based detection), XProtect Remediator actively scans and removes malware from infected systems.  
