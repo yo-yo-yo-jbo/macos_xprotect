@@ -176,7 +176,7 @@ rule XProtect_MACOS_SLEEPYSTEGOSAURUS_SYM {
 This is not a blogpost about YARA rules, but as before - this is a gold mine for malware authors (e.g. `43 68 65 63 6B 50 72 6F 63 65 73 73` is `CheckProcess`).
 
 ### gk.db
-Here you can see the integration between XProtect and [Gatekeeper](https://github.com/yo-yo-yo-jbo/macos_gatekeeper/).  
+Here you can see the how Apple designed XProtect to be integrated with [Gatekeeper](https://github.com/yo-yo-yo-jbo/macos_gatekeeper/) - this file is used mostly by `syspolicyd` though.  
 The file `/Library/Apple/System/Library/CoreServices/XProtect.bundle/Contents/Resources/gk.db` is a SQLite database containing a "blacklist" of file hashes and team IDs to block.  
 You can view it with the `sqlite3` utility:
 
@@ -195,6 +195,41 @@ jbo@McJbo ~ $
 ```
 
 This is again interesting information for malware authors, for example - to know when the Team ID they used to sign their malware with is on Apple's radar.
+
+## Remediation binaries
+While the `XProtect` binary lives under `/Library/Apple/System/Library/CoreServices/XProtect.app/Contents/MacOS/`, you will find additional binaries there.  
+Those are remediation files for specific families:
+
+```
+jbo@McJbo ~ $ ls -l /Library/Apple/System/Library/CoreServices/XProtect.app/Contents/MacOS/
+total 47256
+-rwxr-xr-x  1 root  wheel   513696 Feb 27 16:54 XProtect
+-rwxr-xr-x  1 root  wheel  2498784 Feb 27 16:54 XProtectRemediatorAdload
+-rwxr-xr-x  1 root  wheel  2367952 Feb 27 16:54 XProtectRemediatorBadGacha
+-rwxr-xr-x  1 root  wheel  2053968 Feb 27 16:54 XProtectRemediatorBlueTop
+-rwxr-xr-x  1 root  wheel  2332752 Feb 27 16:54 XProtectRemediatorBundlore
+-rwxr-xr-x  1 root  wheel  2299648 Feb 27 16:54 XProtectRemediatorCardboardCutout
+-rwxr-xr-x  1 root  wheel  2333248 Feb 27 16:54 XProtectRemediatorColdSnap
+-rwxr-xr-x  1 root  wheel  2052736 Feb 27 16:54 XProtectRemediatorCrapyrator
+-rwxr-xr-x  1 root  wheel  2859040 Feb 27 16:54 XProtectRemediatorDolittle
+-rwxr-xr-x  1 root  wheel  2205520 Feb 27 16:54 XProtectRemediatorDubRobber
+-rwxr-xr-x  1 root  wheel  2334752 Feb 27 16:54 XProtectRemediatorEicar
+-rwxr-xr-x  1 root  wheel  2053120 Feb 27 16:54 XProtectRemediatorFloppyFlipper
+-rwxr-xr-x  1 root  wheel  2053616 Feb 27 16:54 XProtectRemediatorGenieo
+-rwxr-xr-x  1 root  wheel  2053504 Feb 27 16:54 XProtectRemediatorGreenAcre
+-rwxr-xr-x  1 root  wheel  2332800 Feb 27 16:54 XProtectRemediatorKeySteal
+-rwxr-xr-x  1 root  wheel  4659088 Feb 27 16:54 XProtectRemediatorMRTv3
+-rwxr-xr-x  1 root  wheel  2382448 Feb 27 16:54 XProtectRemediatorPirrit
+-rwxr-xr-x  1 root  wheel  2333024 Feb 27 16:54 XProtectRemediatorRankStank
+-rwxr-xr-x  1 root  wheel  2299728 Feb 27 16:54 XProtectRemediatorRoachFlight
+-rwxr-xr-x  1 root  wheel  2384416 Feb 27 16:54 XProtectRemediatorSheepSwap
+-rwxr-xr-x  1 root  wheel  2053232 Feb 27 16:54 XProtectRemediatorSnowBeagle
+-rwxr-xr-x  1 root  wheel  2350624 Feb 27 16:54 XProtectRemediatorSnowDrift
+-rwxr-xr-x  1 root  wheel  2019712 Feb 27 16:54 XProtectRemediatorToyDrop
+-rwxr-xr-x  1 root  wheel  2105696 Feb 27 16:54 XProtectRemediatorTrovi
+-rwxr-xr-x  1 root  wheel  2332768 Feb 27 16:54 XProtectRemediatorWaterNet
+jbo@McJbo ~ $
+```
 
 ## XProtect Remediator
 A new XProtect System application stored as `/Library/Apple/System/Library/CoreServices/XProtect.app` wad introduced in macOS Monterey, and is responsible for running `XProtect Remediator`.  
