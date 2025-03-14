@@ -80,11 +80,100 @@ Here is an example of one malware family - [Bundalore](https://attack.mitre.org/
 ```
 
 This is quite human-readable, the only noteworthy part is that the `string` argument in each match is hexadecimal-representation, e.g. `002D00730061006C00740020002D00410020002D00610020002D00640020007C002000620061007300680020002D0073` corresponds to `-salt -A -a -d | bash -s`.  
-This is, of course, a goldmine for malware authors, that know exactly which patterns to avoid.
+This is, of course, a goldmine for malware authors, that know exactly which patterns to avoid.  
 
 ### XProtect.meta.plist
-The file `/System/Library/CoreServices/XProtect.bundle/Contents/Resources/XProtect.meta.plist` is a metadata file that defines additional rules for XProtect, including enforcement policies and versioning information.  
-It specifies which macOS versions enforce certain XProtect rules and actions taken upon detection.
+The file `/Library/Apple/System/Library/CoreServices/XProtect.bundle` is a metadata file that defines additional rules for XProtect, including enforcement policies and versioning information.  
+It specifies which macOS versions enforce certain XProtect rules and actions taken upon detection, as well as blacklists for other types of files such as plugins.  
+Here is an example:
+
+```xml
+<key>JavaWebComponentVersionMinimum</key>
+<string>1.6.0_45-b06-451</string>
+<key>PlugInBlacklist</key>
+<dict>
+        <key>10</key>
+        <dict>
+                <key>com.apple.java.JavaAppletPlugin</key>
+                <dict>
+                        <key>MinimumPlugInBundleVersion</key>
+                        <string>14.8.0</string>
+                        <key>PlugInUpdateAvailable</key>
+                        <true/>
+                </dict>
+                <key>com.apple.java.JavaPlugin2_NPAPI</key>
+                <dict>
+                        <key>MinimumPlugInBundleVersion</key>
+                        <string>14.8.0</string>
+                        <key>PlugInUpdateAvailable</key>
+                        <true/>
+                </dict>
+                <key>com.macromedia.Flash Player ESR.plugin</key>
+                <dict>
+                        <key>MinimumPlugInBundleVersion</key>
+                        <string>18.0.0.382</string>
+                        <key>PlugInUpdateAvailable</key>
+                        <true/>
+                </dict>
+                <key>com.macromedia.Flash Player.plugin</key>
+                <dict>
+                        <key>MinimumPlugInBundleVersion</key>
+                        <string>32.0.0.101</string>
+                        <key>PlugInUpdateAvailable</key>
+                        <true/>
+                </dict>
+                <key>com.microsoft.SilverlightPlugin</key>
+                <dict>
+                        <key>MinimumPlugInBundleVersion</key>
+                        <string>5.1.41212.0</string>
+                        <key>PlugInUpdateAvailable</key>
+                        <true/>
+                </dict>
+                <key>com.oracle.java.JavaAppletPlugin</key>
+                <dict>
+                        <key>MinimumPlugInBundleVersion</key>
+                        <string>1.8.51.16</string>
+                        <key>PlugInUpdateAvailable</key>
+                        <true/>
+                </dict>
+        </dict>
+</dict>
+```
+
+As you can see, those contain version information for "blacklisted" plugins, for instance.
+
+### XProtect.yara
+In recent versions, XProtect seems to have started supporing [YARA](https://virustotal.github.io/yara/).  
+The file `/Library/Apple/System/Library/CoreServices/XProtect.bundle/Contents/Resources/XProtect.yara` contains several YARA rules in a text-format, here's a short example from it:
+
+```yara
+rule XProtect_MACOS_SLEEPYSTEGOSAURUS_SYM {
+    meta:
+        description = "MACOS.SLEEPYSTEGOSAURUS.SYM"
+        uuid = "BB4F7D16-C939-4047-A9AF-E74E7B51FAC1"
+    strings:
+        $a1 = { 45 78 65 63 43 6D 64 }
+        $a2 = { 47 65 74 48 6F 73 74 49 6E 66 6F }
+        $a3 = { 52 75 6E 53 63 72 69 70 74 }
+        $a4 = { 52 75 6E 53 63 72 69 70 74 55 72 6C }
+        $a5 = { 4C 61 75 6E 63 68 50 6C 69 73 74 }
+        $a6 = { 43 68 65 63 6B 50 72 6F 63 65 73 73 }
+        $a7 = { 43 68 65 63 6B 49 6E }
+        $a8 = { 52 75 6E 43 6D 64 46 69 6C 65 }
+        $a9 = { 53 68 6F 77 48 74 6D 6C }
+        $a10 = { 50 6C 69 73 74 48 65 6C 70 65 72 }
+        $a11 = { 4C 61 75 6E 63 68 64 48 65 6C 70 65 72 }
+        $a12 = { 43 6F 6D 6D 61 6E 64 46 69 6C 65 }
+        $a13 = { 57 72 69 74 65 50 6C 69 73 74 }
+        $a14 = { 4A 53 4F 4E 46 69 6C 65 50 72 6F 63 65 73 73 6F 72 }
+        $a15 = { 43 68 72 6F 6D 65 48 65 6C 70 65 72 }
+        $a16 = { 53 61 6E 64 62 6F 78 65 72 }
+    condition:
+        Macho and filesize < 2MB and all of them
+}
+```
+
+This is not a blogpost about YARA rules, but as before - this is a gold mine for malware authors (e.g. `43 68 65 63 6B 50 72 6F 63 65 73 73` is `CheckProcess`).
 
 ## XProtect Remediator
 A new XProtect System application stored as `/Library/Apple/System/Library/CoreServices/XProtect.app` wad introduced in macOS Monterey, and is responsible for running `XProtect Remediator`.  
