@@ -83,7 +83,7 @@ This is quite human-readable, the only noteworthy part is that the `string` argu
 This is, of course, a goldmine for malware authors, that know exactly which patterns to avoid.  
 
 ### XProtect.meta.plist
-The file `/Library/Apple/System/Library/CoreServices/XProtect.bundle` is a metadata file that defines additional rules for XProtect, including enforcement policies and versioning information.  
+The file `/Library/Apple/System/Library/CoreServices/XProtect.bundle/XProtect.meta.plist` is a metadata file that defines additional rules for XProtect, including enforcement policies and versioning information.  
 It specifies which macOS versions enforce certain XProtect rules and actions taken upon detection, as well as blacklists for other types of files such as plugins.  
 Here is an example:
 
