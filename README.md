@@ -11,14 +11,76 @@ It has 3 primary functions:
 - Real-time blocking – XProtect prevents execution of known malicious software before it can run.
 
 ## Traditional XProtect
-The directory `/System/Library/CoreServices/XProtect.bundle` is the main bundle that contains the XProtect configuration and signature definitions.  
+The directory `/Library/Apple/System/Library/CoreServices/XProtect.bundle` is the main bundle that contains the XProtect configuration and signature definitions.  
 This is a read-only system directory and is updated silently by Apple via XProtect updates.  
-Under it, we can find some files of interest.
+Under it, we can find some files of interest, all periodically updated by Apple and protected by [System Integrity Protection (SIP)](https://github.com/yo-yo-yo-jbo/macos_sip/).
 
 ### XProtect.plist
-The file `/System/Library/CoreServices/XProtect.bundle/Contents/Resources/XProtect.plist` stores malware signatures used by XProtect to detect known threats.  
+The file `/Library/Apple/System/Library/CoreServices/XProtect.bundle/Contents/Resources/XProtect.plist` stores malware signatures used by XProtect to detect known threats.  
 It contains entries mapping malware families to specific detection rules, including hashes and filename patterns.  
-This file is periodically updated by Apple, and tampering with it is prevented by [System Integrity Protection (SIP)](https://github.com/yo-yo-yo-jbo/macos_sip/).
+Here is an example of one malware family - [Bundalore](https://attack.mitre.org/software/S0482/):
+
+```xml
+<dict>
+        <key>Description</key>
+        <string>OSX.Bundlore.D</string>
+        <key>LaunchServices</key>
+        <dict>
+                <key>LSItemContentType</key>
+                <string>com.apple.application-bundle</string>
+        </dict>
+        <key>Matches</key>
+        <array>
+                <dict>
+                        <key>MatchFile</key>
+                        <dict>
+                                <key>NSURLTypeIdentifierKey</key>
+                                <string>com.apple.applescript.script</string>
+                        </dict>
+                        <key>MatchType</key>
+                        <string>Match</string>
+                        <key>Pattern</key>
+                        <string>46617364554153</string>
+                </dict>
+                <dict>
+                        <key>MatchFile</key>
+                        <dict>
+                                <key>NSURLTypeIdentifierKey</key>
+                                <string>com.apple.applescript.script</string>
+                        </dict>
+                        <key>MatchType</key>
+                        <string>Match</string>
+                        <key>Pattern</key>
+                        <string>20006500630068006F002000</string>
+                </dict>
+                <dict>
+                        <key>MatchFile</key>
+                        <dict>
+                                <key>NSURLTypeIdentifierKey</key>
+                                <string>com.apple.applescript.script</string>
+                        </dict>
+                        <key>MatchType</key>
+                        <string>Match</string>
+                        <key>Pattern</key>
+                        <string>20007C0020006F00700065006E00730073006C00200065006E00630020002D006100650073002D003200350036002D0063006600620020002D007000610073007300200070006100730073003A</string>
+                </dict>
+                <dict>
+                        <key>MatchFile</key>
+                        <dict>
+                                <key>NSURLTypeIdentifierKey</key>
+                                <string>com.apple.applescript.script</string>
+                        </dict>
+                        <key>MatchType</key>
+                        <string>Match</string>
+                        <key>Pattern</key>
+                        <string>002D00730061006C00740020002D00410020002D00610020002D00640020007C002000620061007300680020002D0073</string>
+                </dict>
+        </array>
+</dict>
+```
+
+This is quite human-readable, the only noteworthy part is that the `string` argument in each match is hexadecimal-representation, e.g. `002D00730061006C00740020002D00410020002D00610020002D00640020007C002000620061007300680020002D0073` corresponds to `-salt -A -a -d | bash -s`.  
+This is, of course, a goldmine for malware authors, that know exactly which patterns to avoid.
 
 ### XProtect.meta.plist
 The file `/System/Library/CoreServices/XProtect.bundle/Contents/Resources/XProtect.meta.plist` is a metadata file that defines additional rules for XProtect, including enforcement policies and versioning information.  
