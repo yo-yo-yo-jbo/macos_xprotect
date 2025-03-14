@@ -84,7 +84,7 @@ This is, of course, a goldmine for malware authors, that know exactly which patt
 
 ### XProtect.meta.plist
 The file `/Library/Apple/System/Library/CoreServices/XProtect.bundle/XProtect.meta.plist` is a metadata file that defines additional rules for XProtect, including enforcement policies and versioning information.  
-It specifies which macOS versions enforce certain XProtect rules and actions taken upon detection, as well as blacklists for other types of files such as plugins.  
+It specifies which macOS versions enforce certain XProtect rules and actions taken upon detection, as well as blacklists for plugins.  
 Here is an example:
 
 ```xml
