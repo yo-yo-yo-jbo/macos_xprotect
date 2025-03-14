@@ -233,3 +233,10 @@ Some of you might have heard about `MRT (Malware Removal Tool)`.
 Stored in `/Library/Apple/System/Library/CoreServices/MRT.app`, MRT is another macOS security component that works alongside XProtect.  
 It is responsible for removing malware that XProtect has detected and operates silently in the background.  
 MRT is more aggressive than XProtect in eradicating detected threats and can remove malicious files even if they are currently running.
+
+## How everything works together
+When a file is downloaded via a browser or an application (e.g., Safari, Mail, Messages), it is marked with a quarantine flag (`com.apple.quarantine`) - I have already mentioned that flag in my [previous blogpost about Gatekeeper](https://github.com/yo-yo-yo-jbo/macos_gatekeeper/).  
+Gatekeeper checks if the file is signed and notarized. If it is not, the user receives a warning before execution.  
+If execution is allowed, XProtect scans the file against its known malware signatures (from `XProtect.plist`, `XProtect.yara` and so on).  
+If malware is detected, the system prevents execution. If the malware is known and can be remediated, `XProtect Remediator` or `MRT` may delete or neutralize it.  
+Apple updates `XProtect`, `MRT`, and `XProtect Remediator` silently in the background via the `XProtectService` process.
