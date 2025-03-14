@@ -283,3 +283,11 @@ Gatekeeper checks if the file is signed and notarized. If it is not, the user re
 If execution is allowed, XProtect scans the file against its known malware signatures (from `XProtect.plist`, `XProtect.yara` and so on).  
 If malware is detected, the system prevents execution. If the malware is known and can be remediated, `XProtect Remediator` or `MRT` may delete or neutralize it.  
 Apple updates `XProtect`, `MRT`, and `XProtect Remediator` silently in the background via the `XProtectService` process.
+
+## Summary
+The biggest takeaway from this blogpost is that `XProtect` plays a game of cat-and-mouse with attackers (just like any Antivirus) - blacklisting, running YARA or simple static signatures are all in scope.  
+The fact those files are deployed to all endpoints and are easy to analyze makes it quite easy for malware authors to find easy bypasses to many of those checks.
+
+Stat tuned!
+
+Jonathan Bar Or
