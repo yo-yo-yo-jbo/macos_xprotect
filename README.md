@@ -191,7 +191,7 @@ Q6XAB4776L|0
 DK5C9Y86C8|0
 8VK2WEPW22|0
 5LWMEF3EX3|0
-root@McJbo Resources #
+jbo@McJbo ~ $
 ```
 
 This is again interesting information for malware authors, for example - to know when the Team ID they used to sign their malware with is on Apple's radar.
@@ -201,6 +201,32 @@ A new XProtect System application stored as `/Library/Apple/System/Library/CoreS
 Unlike the traditional XProtect (which primarily used signature-based detection), XProtect Remediator actively scans and removes malware from infected systems.  
 It runs as a background process and can automatically remove detected threats without user intervention.
 The directory `/Library/Apple/System/Library/CoreServices/XProtect.app/Contents/Resources` contains emediation scripts and additional detection logic for active scanning.
+
+### com.apple.XProtect.agent.scan.plist
+The file `/Library/Apple/System/Library/CoreServices/XProtect.app/Contents/Resources/com.apple.XProtect.agent.scan.plist` contains settings about when to run periodic scans.  
+For instance:
+
+```xml
+<key>com.apple.XProtect.PluginService.agent.slow.scan</key>
+<dict>
+        <key>Repeating</key>
+        <true/>
+        <key>PowerNap</key>
+        <true/>
+        <key>CPUIntensive</key>
+        <true/>
+        <key>DiskIntensive</key>
+        <true/>
+        <key>AllowBattery</key>
+        <false/>
+        <key>Priority</key>
+        <string>Utility</string>
+        <key>Interval</key>
+        <integer>604800</integer>
+</dict>
+```
+
+This shows certain performance conditions and even the scan's period (604800 seconds = once every 7 days).
 
 ## MRT
 Some of you might have heard about `MRT (Malware Removal Tool)`.  
