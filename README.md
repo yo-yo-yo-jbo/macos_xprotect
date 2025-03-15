@@ -284,6 +284,43 @@ If execution is allowed, XProtect scans the file against its known malware signa
 If malware is detected, the system prevents execution. If the malware is known and can be remediated, `XProtect Remediator` or `MRT` may delete or neutralize it.  
 Apple updates `XProtect`, `MRT`, and `XProtect Remediator` silently in the background via the `XProtectService` process.
 
+## Honorable mention - Banshee
+Earlier this year, CheckPoint have published a [blogpost about a malware sample dubbed Banshee](https://research.checkpoint.com/2025/banshee-macos-stealer-that-stole-code-from-macos-xprotect/).  
+That got quite a lot of attention since it used the same encryption algorithm that `XProtect Remediator` binaries use to "hide their YARA rules".  
+The algorithm itself is simple:
+
+```python
+def macos_xprotect_string_decryption(encrypted: bytes, encr_key: int) -> str:
+    """
+    Author: @Check Point Research
+    Decrypts MacOS Xprotect binaries & Banshee Stealer encrypted strings.
+    """
+    decrypted = "".join(
+        chr(
+            (encr_key >> ((i * 8) & 0x38) & 0xFF) ^ encrypted[i]
+        )
+        for i in range(len(encrypted))
+    )
+    return decrypted.partition("\\x00")[0]
+```
+
+Obviously the malware authors thought that this algorithm cannot be statically signed (since it's guaranteed to generate false positives).  
+I found a similar code in most remediator binaries, e.g.:
+
+```c
+10000592a      if (data_1000ffe7e != 0)
+10000592c          void* rax_1 = &data_1000fb0a0
+100005933          int64_t i = 0
+100005951          do
+100005940              *rax_1 = *rax_1 ^ (0x363a34363a303900 u>> (i.b & 0x38)).b
+100005943              i = i + 8
+100005947              rax_1 = rax_1 + 1
+100005951          while (i != 0x26ef0)
+100005953          data_1000ffe7e = 0
+```
+
+The security researchere who [initially](https://alden.io/posts/secrets-of-xprotect/#reverse-engineering-the-redpine-remediator) found that out ([ald3ns](https://x.com/birchb0y)) has released a tool called [XPR-dump](https://github.com/ald3ns/XPR-dump/tree/main) that seems to still be working on newest XProtect version. You should definitely check it out!
+
 ## Summary
 The biggest takeaway from this blogpost is that `XProtect` plays a game of cat-and-mouse with attackers (just like any Antivirus) - blacklisting, running YARA or simple static signatures are all in scope.  
 The fact those files are deployed to all endpoints and are easy to analyze makes it quite easy for malware authors to find easy bypasses to many of those checks.
